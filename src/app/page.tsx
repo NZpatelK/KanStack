@@ -1,9 +1,9 @@
 import Image from "next/image";
-import Board from "./components/board";
+import Board from "./components/Board";
 
 export default function Home() {
   return (
-    <div className="h-screen w-full">
+    <div className="h-screen m-20">
       <Board />
     </div>
   );
