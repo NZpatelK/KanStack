@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, DragEvent } from "react";
 import Card from "./Card";
 import AddCard from "./AddCard";
 import DropIndicator from "./DropIndicator";
@@ -21,6 +21,10 @@ export default function Column({ title, headingColor, column, cards, setCards }:
   const [active, setActive] = useState(false);
   const filteredCards = cards.filter((card) => card.column === column);
 
+  const handleDragStart = (e: DragEvent<HTMLDivElement>, card: CardProps) => {
+      e.dataTransfer.setData("cardId", card.id);
+  }
+
   return (
     <div className="w-56 shrink-0">
       <div className="mb-3 flex items-center justify-between">
@@ -29,7 +33,7 @@ export default function Column({ title, headingColor, column, cards, setCards }:
       </div>
       <div className={`h-full w-full transition-all ${active ? "bg-neutral-800/50" : "bg-neutral-800/0"}`}>
         {filteredCards.map((card, index) => (
-          <Card key={index} title={card.title} id={card.id} column={card.column} />
+          <Card key={index} title={card.title} id={card.id} column={card.column} handleDragStart={handleDragStart}  />
         ))}
         <DropIndicator beforeId={"-1"} column={column} />
         <AddCard column={column} setCards={setCards} />

@@ -37,7 +37,7 @@ export default function Board() {
                     setCards={setCards} 
                 />
             ))}
-            <BurnBarrel cards={cards} />
+            <BurnBarrel setCards={setCards} />
         </div>
     );
 }
