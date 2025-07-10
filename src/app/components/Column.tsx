@@ -32,8 +32,8 @@ export default function Column({ title, headingColor, column, cards, setCards }:
         <span className="rounded text-sm text-neutral-400">{filteredCards.length}</span>
       </div>
       <div className={`h-full w-full transition-all ${active ? "bg-neutral-800/50" : "bg-neutral-800/0"}`}>
-        {filteredCards.map((card, index) => (
-          <Card key={index} title={card.title} id={card.id} column={card.column} handleDragStart={handleDragStart}  />
+        {filteredCards.map((card) => (
+          <Card key={card.id} title={card.title} id={card.id} column={card.column} handleDragStart={handleDragStart}  />
         ))}
         <DropIndicator beforeId={"-1"} column={column} />
         <AddCard column={column} setCards={setCards} />
