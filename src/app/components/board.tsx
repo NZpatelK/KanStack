@@ -1,6 +1,7 @@
 'use client';
 import { useState } from "react";
 import Column from "./Column";
+import { LIST_DATA } from "@/lib/data/listData";
 
 interface ColumnProps {
     title: string;
@@ -8,9 +9,16 @@ interface ColumnProps {
     column: string;
 }
 
+interface CardProps {
+    title: string;
+    id: string;
+    column: string;
+}
+
 export default function Board() {
-    const [cards, setCards] = useState<string[]>([]);
+    const [cards, setCards] = useState<CardProps[]>(LIST_DATA);
     const [columns, setColumns] = useState<ColumnProps[]>([
+        { title: "Backlog", headingColor: "text-gray-200", column: "backlog" },
         { title: "To Do", headingColor: "text-yellow-200", column: "todo" },
         { title: "In Progress", headingColor: "text-blue-200", column: "doing" },
         { title: "Done", headingColor: "text-emerald-200", column: "done" }]);
