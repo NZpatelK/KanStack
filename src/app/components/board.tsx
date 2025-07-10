@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Column from "./Column";
 import { LIST_DATA } from "@/lib/data/listData";
+import BurnBarrel from "./BurnBarrel";
 
 interface ColumnProps {
     title: string;
@@ -28,6 +29,7 @@ export default function Board() {
             {columns.map((column, index) => (
                 <Column key={index} title={column.title} headingColor={column.headingColor} column={column.column} cards={cards} setCards={(e: string[]) => { setCards([...e]) }} />
             ))}
+            <BurnBarrel cards={cards} />
         </div>
     );
 }
