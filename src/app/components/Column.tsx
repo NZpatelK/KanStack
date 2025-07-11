@@ -83,7 +83,7 @@ export default function Column({ title, headingColor, column, cards, setCards }:
 
         const cardId = e.dataTransfer.getData("cardId");
         const indicators = getIndicators();
-        const { element } = getNearestIndicator(e, indicators);
+        const { element } = getNearestIndicator(e, indicators as HTMLDivElement[]);
 
         const before = element.dataset.before || "-1";
 
