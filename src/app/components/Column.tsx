@@ -121,7 +121,7 @@ export default function Column({ title, headingColor, column, cards, setCards }:
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDragEnd}
-                className={`h-full w-full transition-colors duration-300  ${active ? "bg-neutral-800/50" : "bg-neutral-800/0"}`}>
+                className={`relative h-full w-full transition-colors duration-300  ${active ? "bg-neutral-800/50" : "bg-neutral-800/0"}`}>
                 {filteredCards.map((card) => (
                     <Card key={card.id} title={card.title} id={card.id} column={card.column} handleDragStart={handleDragStart} />
                 ))}

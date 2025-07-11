@@ -26,7 +26,7 @@ export default function Board() {
     ]);
 
     return (
-        <div className="h-full w-full flex gap-3">
+        <div className="flex gap-3 m-20">
             {columns.map((column, index) => (
                 <Column
                     key={index}
