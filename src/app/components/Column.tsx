@@ -3,6 +3,7 @@ import Card from "./Card";
 import AddCard from "./AddCard";
 import DropIndicator from "./DropIndicator";
 import { clear } from "console";
+import { FaTrash } from "react-icons/fa";
 
 interface ColumnProps {
     title: string;
@@ -10,6 +11,7 @@ interface ColumnProps {
     column: string;
     cards: CardProps[];
     setCards: Dispatch<SetStateAction<CardProps[]>>;
+    handleChangeTitle: (id: string, title: string) => void
 }
 
 interface CardProps {
@@ -18,7 +20,7 @@ interface CardProps {
     column: string;
 }
 
-export default function Column({ title, headingColor, column, cards, setCards }: ColumnProps) {
+export default function Column({ title, headingColor, column, cards, setCards, handleChangeTitle }: ColumnProps) {
     const [active, setActive] = useState(false);
     const filteredCards = cards.filter((card) => card.column === column);
 
@@ -39,7 +41,7 @@ export default function Column({ title, headingColor, column, cards, setCards }:
         el.element.style.opacity = "1";
     }
 
-    const clearHighlights = (els ?: HTMLDivElement[]) => {
+    const clearHighlights = (els?: HTMLDivElement[]) => {
         const indicators = els || getIndicators() as HTMLDivElement[];
         indicators.forEach((i) => {
             i.style.opacity = "0";
@@ -111,19 +113,33 @@ export default function Column({ title, headingColor, column, cards, setCards }:
         }
     }
 
+    const handleDeleteCard = (cardId: string) => {
+        setCards((prev) => prev.filter((card) => card.id !== cardId));
+        setActive(false);
+        clearHighlights();
+    }
+
+
     return (
         <div className="w-56 shrink-0">
             <div className="mb-3 flex items-center justify-between">
-                <h3 className={`font-medium ${headingColor}`}>{title}</h3>
+                {/* <h3 className={`font-medium ${headingColor}`}>{title}</h3> */}
+                <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => handleChangeTitle(column, e.target.value)}
+                    className={`p-2 rounded font-medium bg-transparent border-none outline-none focus:bg-violet-400/20 focus:outline focus:outline-violet-400 focus:ring-2 focus:ring-violet-400 ${headingColor}`}
+                />
+
                 <span className="rounded text-sm text-neutral-400">{filteredCards.length}</span>
             </div>
             <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDragEnd}
-                className={`relative h-full w-full transition-colors duration-300  ${active ? "bg-neutral-800/50" : "bg-neutral-800/0"}`}>
+                className={`relative h-full w-full transition-colors duration-300  ${active ? "bg-neutral-800/20" : "bg-neutral-800/0"}`}>
                 {filteredCards.map((card) => (
-                    <Card key={card.id} title={card.title} id={card.id} column={card.column} handleDragStart={handleDragStart} />
+                    <Card key={card.id} title={card.title} id={card.id} column={card.column} handleDragStart={handleDragStart} handleDeleteCard={handleDeleteCard} />
                 ))}
                 <DropIndicator beforeId={"-1"} column={column} />
                 <AddCard column={column} setCards={setCards} />

@@ -38,6 +38,17 @@ export default function Board() {
 
     }
 
+    const handleChangeTitle = (id: string, title: string) => {
+        setColumns((prevColumns) =>
+            prevColumns.map((column) => {
+                if (column.column === id) {
+                    return { ...column, title };
+                }
+                return column;
+            })
+        );
+    };
+
     return (
         <div className="flex gap-3 m-20">
             {columns.map((column, index) => (
@@ -48,6 +59,7 @@ export default function Board() {
                     column={column.column}
                     cards={cards}
                     setCards={setCards}
+                    handleChangeTitle={handleChangeTitle}
                 />
             ))}
 
