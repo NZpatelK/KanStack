@@ -2,8 +2,8 @@ import { Dispatch, SetStateAction, useState, DragEvent } from "react";
 import Card from "./Card";
 import AddCard from "./AddCard";
 import DropIndicator from "./DropIndicator";
-import { clear } from "console";
-import { FaTrash } from "react-icons/fa";
+import { LuGripVertical } from "react-icons/lu";
+import { motion, Variants } from "framer-motion";
 
 interface ColumnProps {
     title: string;
@@ -119,19 +119,42 @@ export default function Column({ title, headingColor, column, cards, setCards, h
         clearHighlights();
     }
 
+    const gripVariants: Variants = {
+        initial: { x: -25 },
+        hover: {
+            x: 0,
+            transition: {
+                duration: 0.3,
+                ease: [0.42, 0, 0.58, 1], // Equivalent to easeInOut
+            },
+        },
+    };
+
+
 
     return (
         <div className="w-56 shrink-0">
-            <div className="mb-3 flex items-center justify-between">
-                {/* <h3 className={`font-medium ${headingColor}`}>{title}</h3> */}
-                <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => handleChangeTitle(column, e.target.value)}
-                    className={`p-2 rounded font-medium bg-transparent border-none outline-none focus:bg-violet-400/20 focus:outline focus:outline-violet-400 focus:ring-2 focus:ring-violet-400 ${headingColor}`}
-                />
+            <div className="relative mb-2 flex items-center justify-between px-1">
+                <motion.div
+                    initial="initial"
+                    whileHover="hover"
+                    className="group flex items-center"
+                    variants={gripVariants}
+                >
+                    <LuGripVertical className="text-neutral-400 opacity-0 group-hover:opacity-100 cursor-grab transition duration-300 active:cursor-grabbing" />
 
-                <span className="rounded text-sm text-neutral-400">{filteredCards.length}</span>
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => handleChangeTitle(column, e.target.value)}
+                        className={`pl-2 pr-2 rounded font-medium bg-transparent border-none outline-none focus:bg-violet-400/20 focus:outline focus:outline-violet-400 focus:ring-2 focus:ring-violet-400 ${headingColor}`}
+                    />
+                </motion.div>
+
+                {/* Card count */}
+                <span className="rounded text-sm text-neutral-400">
+                    {filteredCards.length} 
+                </span>
             </div>
             <div
                 onDragOver={handleDragOver}
