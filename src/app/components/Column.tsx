@@ -4,14 +4,22 @@ import AddCard from "./AddCard";
 import DropIndicator from "./DropIndicator";
 import { LuGripVertical } from "react-icons/lu";
 import { motion, Variants } from "framer-motion";
+import { clearHighlights, getIndicators, getNearestIndicator, highlightIndicator } from "@/lib/data/utils/dragHelper";
 
-interface ColumnProps {
+interface ColumnsProps {
     title: string;
     headingColor: string;
     column: string;
     cards: CardProps[];
     setCards: Dispatch<SetStateAction<CardProps[]>>;
-    handleChangeTitle: (id: string, title: string) => void
+    handleChangeTitle: (id: string, title: string) => void;
+    handleUpdateColumnOrder: (before: string, columnId: string) => void;
+}
+
+interface ColumnProps {
+    title: string;
+    headingColor: string;
+    column: string;
 }
 
 interface CardProps {
@@ -20,7 +28,7 @@ interface CardProps {
     column: string;
 }
 
-export default function Column({ title, headingColor, column, cards, setCards, handleChangeTitle }: ColumnProps) {
+export default function Column({ title, headingColor, column, cards, setCards, handleChangeTitle, handleUpdateColumnOrder }: ColumnsProps) {
     const [active, setActive] = useState(false);
     const filteredCards = cards.filter((card) => card.column === column);
 
@@ -30,61 +38,22 @@ export default function Column({ title, headingColor, column, cards, setCards, h
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        highlightIndicator(e);
+        highlightIndicator(e, column);
         setActive(true);
-    }
-
-    const highlightIndicator = (e: DragEvent<HTMLDivElement>) => {
-        const indicators = getIndicators() as HTMLDivElement[];
-        clearHighlights(indicators);
-        const el = getNearestIndicator(e, indicators);
-        el.element.style.opacity = "1";
-    }
-
-    const clearHighlights = (els?: HTMLDivElement[]) => {
-        const indicators = els || getIndicators() as HTMLDivElement[];
-        indicators.forEach((i) => {
-            i.style.opacity = "0";
-        });
-    }
-
-    const getNearestIndicator = (e: DragEvent<HTMLDivElement>, indicators: HTMLDivElement[]) => {
-        const el = indicators.reduce(
-            (closest, child) => {
-                const box = child.getBoundingClientRect();
-
-                const offset = e.clientY - (box.top + 50);
-
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            },
-            {
-                offset: Number.NEGATIVE_INFINITY,
-                element: indicators[indicators.length - 1],
-            }
-        );
-
-        return el;
-    }
-    const getIndicators = () => {
-        return Array.from(document.querySelectorAll(`[data-column="${column}"]`));
     }
 
     const handleDragLeave = () => {
         setActive(false);
-        clearHighlights();
+        clearHighlights(column);
     }
 
     const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setActive(false);
-        clearHighlights();
+        clearHighlights(column);
 
         const cardId = e.dataTransfer.getData("cardId");
-        const indicators = getIndicators();
+        const indicators = getIndicators(column);
         const { element } = getNearestIndicator(e, indicators as HTMLDivElement[]);
 
         const before = element.dataset.before || "-1";
@@ -113,10 +82,28 @@ export default function Column({ title, headingColor, column, cards, setCards, h
         }
     }
 
+    // const handleColumnDragEnd = (e: DragEvent<HTMLDivElement>) => {
+    //     e.preventDefault();
+
+    //     const columnId = e.dataTransfer.getData("columnId")
+    //     const indicators = getIndicators();
+    //     const { element } = getNearestIndicator(e, indicators as HTMLDivElement[]);
+
+    //     const before = element.dataset.before || "-1";
+
+    //     console.log(before, columnId);
+
+    //     handleUpdateColumnOrder(before, columnId);
+    // }
+
+    // const handleColumnDragStart = (e: DragEvent<HTMLDivElement>, columnId: string) => {
+    //     e.dataTransfer.setData("columnId", columnId);
+    // }
+
     const handleDeleteCard = (cardId: string) => {
         setCards((prev) => prev.filter((card) => card.id !== cardId));
         setActive(false);
-        clearHighlights();
+        clearHighlights(column);
     }
 
     const gripVariants: Variants = {
@@ -136,11 +123,15 @@ export default function Column({ title, headingColor, column, cards, setCards, h
         <div className="w-56 shrink-0">
             <div className="relative mb-2 flex items-center justify-between px-1">
                 <motion.div
+                    layout
+                    draggable
+                    // onDragStart={(e) => handleColumnDragStart(e, column)}
+                    // onDrop={handleColumnDragEnd}
                     initial="initial"
                     whileHover="hover"
-                    className="group flex items-center"
-                    variants={gripVariants}
-                >
+                    className="group flex items-center z-9"
+                    variants={gripVariants}>
+
                     <LuGripVertical className="text-neutral-400 opacity-0 group-hover:opacity-100 cursor-grab transition duration-300 active:cursor-grabbing" />
 
                     <input
@@ -153,7 +144,7 @@ export default function Column({ title, headingColor, column, cards, setCards, h
 
                 {/* Card count */}
                 <span className="rounded text-sm text-neutral-400">
-                    {filteredCards.length} 
+                    {filteredCards.length}
                 </span>
             </div>
             <div

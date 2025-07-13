@@ -1,8 +1,10 @@
 'use client';
-import { useState } from "react";
+import { useState, DragEvent } from "react";
 import Column from "./Column";
 import { LIST_DATA } from "@/lib/data/listData";
 import { FiPlus } from "react-icons/fi";
+import DropIndicatorColumn from "./DropIndicatorColumn";
+
 
 interface ColumnProps {
     title: string;
@@ -48,19 +50,50 @@ export default function Board() {
         );
     };
 
+    const handleUpdateColumnOrder = (before: string, columnId: string) => {
+        if (before !== columnId) {
+            let copy = [...columns];
+
+            let columnToTransfer = copy.find((c) => c.column === columnId);
+            if (!columnToTransfer) return;
+            columnToTransfer = { ...columnToTransfer };
+
+            copy = copy.filter((c) => c.column !== columnId);
+
+            const moveToBack = before === "-1";
+
+            if (moveToBack) {
+                copy.push(columnToTransfer);
+            } else {
+                const insertAtIndex = copy.findIndex((el) => el.column === before);
+                if (insertAtIndex === undefined) return;
+
+                copy.splice(insertAtIndex, 0, columnToTransfer);
+            }
+
+            setColumns(copy);
+        }
+    }
+    
+
     return (
         <div className="flex gap-3 m-20">
             {columns.map((column, index) => (
-                <Column
-                    key={index}
-                    title={column.title}
-                    headingColor={column.headingColor}
-                    column={column.column}
-                    cards={cards}
-                    setCards={setCards}
-                    handleChangeTitle={handleChangeTitle}
-                />
+                <>
+                    <DropIndicatorColumn key={`indicator-${index}`} beforeId={column.column} column={column.column} />
+                    <Column
+                        key={column.column}
+                        title={column.title}
+                        headingColor={column.headingColor}
+                        column={column.column}
+                        cards={cards}
+                        setCards={setCards}
+                        handleChangeTitle={handleChangeTitle}
+                        handleUpdateColumnOrder={handleUpdateColumnOrder}
+                    />
+                </>
             ))}
+            <DropIndicatorColumn beforeId={"-1"} column={"TODO"} />
 
             <div className="">
                 <button onClick={handleCreateNewColumn} className="flex items-center p-2 text-xs text-nowrap text-gray-400  mt-1 mx-5 hover:text-gray-300"><span className="mr-2">Add Column</span> <FiPlus /></button>
