@@ -4,15 +4,20 @@ import AddCard from "./AddCard";
 import DropIndicator from "./DropIndicator";
 import { motion, Variants } from "framer-motion";
 import { clearHighlights, getIndicators, getNearestIndicator, highlightIndicator } from "@/lib/data/utils/dragHelper";
+import ColumnDropIndicator from "./ColumnDropIndicator";
 
 interface ColumnsProps {
+    column: ColumnProps;
+    cards: CardProps[];
+    setCards: Dispatch<SetStateAction<CardProps[]>>;
+    handleChangeTitle: (id: string, title: string) => void;
+}
+
+interface ColumnProps {
     id: string;
     title: string;
     headingColor: string;
     column: string;
-    cards: CardProps[];
-    setCards: Dispatch<SetStateAction<CardProps[]>>;
-    handleChangeTitle: (id: string, title: string) => void;
 }
 
 interface CardProps {
@@ -21,9 +26,9 @@ interface CardProps {
     column: string;
 }
 
-export default function Column({ id, title, headingColor, column, cards, setCards, handleChangeTitle }: ColumnsProps) {
+export default function Column({ column, cards, setCards, handleChangeTitle }: ColumnsProps) {
     const [active, setActive] = useState(false);
-    const filteredCards = cards.filter((card) => card.column === column);
+    const filteredCards = cards.filter((card) => card.column === column.column);
 
     //------------------------------------- CARD DRAG EVENTS ------------------------------------//
     const handleDragStart = (e: DragEvent<HTMLDivElement>, card: CardProps) => {
@@ -32,22 +37,22 @@ export default function Column({ id, title, headingColor, column, cards, setCard
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        highlightIndicator(e, column);
+        highlightIndicator(e, column.column);
         setActive(true);
     }
 
     const handleDragLeave = () => {
         setActive(false);
-        clearHighlights(column);
+        clearHighlights(column.column);
     }
 
     const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setActive(false);
-        clearHighlights(column);
+        clearHighlights(column.column);
 
         const cardId = e.dataTransfer.getData("cardId");
-        const indicators = getIndicators(column);
+        const indicators = getIndicators(column.column);
         const { element } = getNearestIndicator(e, indicators as HTMLDivElement[]);
 
         const before = element.dataset.before || "-1";
@@ -57,7 +62,7 @@ export default function Column({ id, title, headingColor, column, cards, setCard
 
             let cardToTransfer = copy.find((c) => c.id === cardId);
             if (!cardToTransfer) return;
-            cardToTransfer = { ...cardToTransfer, column };
+            cardToTransfer = { ...cardToTransfer, column: column.column };
 
             copy = copy.filter((c) => c.id !== cardId);
 
@@ -76,63 +81,58 @@ export default function Column({ id, title, headingColor, column, cards, setCard
         }
     }
 
-
     const handleDeleteCard = (cardId: string) => {
         setCards((prev) => prev.filter((card) => card.id !== cardId));
         setActive(false);
-        clearHighlights(column);
+        clearHighlights(column.column);
     }
 
-
-
-    const gripVariants: Variants = {
-        initial: { x: -25 },
-        hover: {
-            x: 0,
-            transition: {
-                duration: 0.3,
-                ease: [0.42, 0, 0.58, 1], // Equivalent to easeInOut
-            },
-        },
-    };
+    // const gripVariants: Variants = {
+    //     initial: { x: -25 },
+    //     hover: {
+    //         x: 0,
+    //         transition: {
+    //             duration: 0.3,
+    //             ease: [0.42, 0, 0.58, 1], // Equivalent to easeInOut
+    //         },
+    //     },
+    // };
 
 
 
     return (
-        <div>
-            <div className="w-56 shrink-0 flex px-7">
-                <motion.div
-                    layout
-                    initial="initial"
-                    whileHover="hover"
-                    className="group flex items-center z-9"
-                    variants={gripVariants}>
+        <div className="flex">
+            <ColumnDropIndicator beforeId={column.id} column={column.column} />
+            <div>
+                <div className="w-56 shrink-0 flex px-1">
+                    <motion.div
+                        layout
+                        className="group flex items-center">
 
-                    {/* <LuGripVertical className="text-neutral-400 opacity-0 group-hover:opacity-100 cursor-grab transition duration-300 active:cursor-grabbing" /> */}
+                        <input
+                            type="text"
+                            value={column.title}
+                            onChange={(e) => handleChangeTitle(column.column, e.target.value)}
+                            className={`pl-2 pr-2 rounded font-medium bg-transparent border-none outline-none focus:bg-violet-400/20 focus:outline focus:outline-violet-400 focus:ring-2 focus:ring-violet-400 ${column.headingColor}`}
+                        />
+                    </motion.div>
 
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => handleChangeTitle(column, e.target.value)}
-                        className={`pl-2 pr-2 rounded font-medium bg-transparent border-none outline-none focus:bg-violet-400/20 focus:outline focus:outline-violet-400 focus:ring-2 focus:ring-violet-400 ${headingColor}`}
-                    />
-                </motion.div>
-
-                {/* Card count */}
-                <span className="rounded text-sm text-neutral-400">
-                    {filteredCards.length}
-                </span>
-            </div>
-            <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDragEnd}
-                className={`relative h-full w-full transition-colors duration-300  ${active ? "bg-neutral-800/20" : "bg-neutral-800/0"}`}>
-                {filteredCards.map((card) => (
-                    <Card key={card.id} title={card.title} id={card.id} column={card.column} handleDragStart={handleDragStart} handleDeleteCard={handleDeleteCard} />
-                ))}
-                <DropIndicator beforeId={"-1"} column={column} />
-                <AddCard column={column} setCards={setCards} />
+                    {/* Card count */}
+                    <span className="rounded text-sm text-neutral-400">
+                        {filteredCards.length}
+                    </span>
+                </div>
+                <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDragEnd}
+                    className={`relative h-full w-full transition-colors duration-300  ${active ? "bg-neutral-800/20" : "bg-neutral-800/0"}`}>
+                    {filteredCards.map((card) => (
+                        <Card key={card.id} title={card.title} id={card.id} column={card.column} handleDragStart={handleDragStart} handleDeleteCard={handleDeleteCard} />
+                    ))}
+                    <DropIndicator beforeId={"-1"} column={column.column} />
+                    <AddCard column={column.column} setCards={setCards} />
+                </div>
             </div>
         </div>
     );

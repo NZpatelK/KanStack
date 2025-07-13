@@ -51,41 +51,13 @@ export default function Board() {
         );
     };
 
-    const handleUpdateColumnOrder = (before: string, columnId: string) => {
-        if (before !== columnId) {
-            let copy = [...columns];
-
-            let columnToTransfer = copy.find((c) => c.column === columnId);
-            if (!columnToTransfer) return;
-            columnToTransfer = { ...columnToTransfer };
-
-            copy = copy.filter((c) => c.column !== columnId);
-
-            const moveToBack = before === "-1";
-
-            if (moveToBack) {
-                copy.push(columnToTransfer);
-            } else {
-                const insertAtIndex = copy.findIndex((el) => el.column === before);
-                if (insertAtIndex === undefined) return;
-
-                copy.splice(insertAtIndex, 0, columnToTransfer);
-            }
-
-            setColumns(copy);
-        }
-    }
-
 
     return (
         <div className="flex gap-3 m-20">
             {columns.map((column) => (
                 <Column
                     key={column.id}
-                    id={column.id}
-                    title={column.title}
-                    headingColor={column.headingColor}
-                    column={column.column}
+                    column={column}
                     cards={cards}
                     setCards={setCards}
                     handleChangeTitle={handleChangeTitle}
