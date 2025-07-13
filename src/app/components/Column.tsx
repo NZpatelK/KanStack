@@ -2,24 +2,17 @@ import { Dispatch, SetStateAction, useState, DragEvent } from "react";
 import Card from "./Card";
 import AddCard from "./AddCard";
 import DropIndicator from "./DropIndicator";
-import { LuGripVertical } from "react-icons/lu";
 import { motion, Variants } from "framer-motion";
 import { clearHighlights, getIndicators, getNearestIndicator, highlightIndicator } from "@/lib/data/utils/dragHelper";
 
 interface ColumnsProps {
+    id: string;
     title: string;
     headingColor: string;
     column: string;
     cards: CardProps[];
     setCards: Dispatch<SetStateAction<CardProps[]>>;
     handleChangeTitle: (id: string, title: string) => void;
-    handleUpdateColumnOrder: (before: string, columnId: string) => void;
-}
-
-interface ColumnProps {
-    title: string;
-    headingColor: string;
-    column: string;
 }
 
 interface CardProps {
@@ -28,10 +21,11 @@ interface CardProps {
     column: string;
 }
 
-export default function Column({ title, headingColor, column, cards, setCards, handleChangeTitle, handleUpdateColumnOrder }: ColumnsProps) {
+export default function Column({ id, title, headingColor, column, cards, setCards, handleChangeTitle }: ColumnsProps) {
     const [active, setActive] = useState(false);
     const filteredCards = cards.filter((card) => card.column === column);
 
+    //------------------------------------- CARD DRAG EVENTS ------------------------------------//
     const handleDragStart = (e: DragEvent<HTMLDivElement>, card: CardProps) => {
         e.dataTransfer.setData("cardId", card.id);
     }
@@ -82,29 +76,14 @@ export default function Column({ title, headingColor, column, cards, setCards, h
         }
     }
 
-    // const handleColumnDragEnd = (e: DragEvent<HTMLDivElement>) => {
-    //     e.preventDefault();
-
-    //     const columnId = e.dataTransfer.getData("columnId")
-    //     const indicators = getIndicators();
-    //     const { element } = getNearestIndicator(e, indicators as HTMLDivElement[]);
-
-    //     const before = element.dataset.before || "-1";
-
-    //     console.log(before, columnId);
-
-    //     handleUpdateColumnOrder(before, columnId);
-    // }
-
-    // const handleColumnDragStart = (e: DragEvent<HTMLDivElement>, columnId: string) => {
-    //     e.dataTransfer.setData("columnId", columnId);
-    // }
 
     const handleDeleteCard = (cardId: string) => {
         setCards((prev) => prev.filter((card) => card.id !== cardId));
         setActive(false);
         clearHighlights(column);
     }
+
+
 
     const gripVariants: Variants = {
         initial: { x: -25 },
@@ -120,19 +99,16 @@ export default function Column({ title, headingColor, column, cards, setCards, h
 
 
     return (
-        <div className="w-56 shrink-0">
-            <div className="relative mb-2 flex items-center justify-between px-1">
+        <div>
+            <div className="w-56 shrink-0 flex px-7">
                 <motion.div
                     layout
-                    draggable
-                    // onDragStart={(e) => handleColumnDragStart(e, column)}
-                    // onDrop={handleColumnDragEnd}
                     initial="initial"
                     whileHover="hover"
                     className="group flex items-center z-9"
                     variants={gripVariants}>
 
-                    <LuGripVertical className="text-neutral-400 opacity-0 group-hover:opacity-100 cursor-grab transition duration-300 active:cursor-grabbing" />
+                    {/* <LuGripVertical className="text-neutral-400 opacity-0 group-hover:opacity-100 cursor-grab transition duration-300 active:cursor-grabbing" /> */}
 
                     <input
                         type="text"
