@@ -10,7 +10,7 @@ export const getNearestIndicator = (
     return indicators.reduce(
         (closest, child) => {
             const box = child.getBoundingClientRect();
-            const offset = e.clientY - (box.top + box.height / 2); // dynamic center
+            const offset = e.clientY - (box.top + 50);
 
             if (offset < 0 && offset > closest.offset) {
                 return { offset, element: child };

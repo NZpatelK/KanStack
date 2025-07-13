@@ -3,6 +3,7 @@ import { useState } from "react";
 import Column from "./Column";
 import { LIST_DATA } from "@/lib/data/listData";
 import { FiPlus } from "react-icons/fi";
+import ColumnDropIndicator from "./ColumnDropIndicator";
 
 
 interface ColumnProps {
@@ -63,6 +64,7 @@ export default function Board() {
                     handleChangeTitle={handleChangeTitle}
                 />
             ))}
+            <ColumnDropIndicator beforeId={columns.length.toString()} column={"column"} />
 
             <div className="">
                 <button onClick={handleCreateNewColumn} className="flex items-center p-2 text-xs text-nowrap text-gray-400  mt-1 mx-5 hover:text-gray-300"><span className="mr-2">Add Column</span> <FiPlus /></button>

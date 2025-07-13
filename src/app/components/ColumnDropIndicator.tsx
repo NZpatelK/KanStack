@@ -7,7 +7,7 @@ export default function ColumnDropIndicator( {beforeId, column}: DropIndicatorPr
     return (
         <div 
         data-before={beforeId || "-1"}
-        data-column={column}
+        data-board={column}
         className="mr-3 h-full w-0.5 bg-violet-400 opacity-100"></div>
     )
 }
